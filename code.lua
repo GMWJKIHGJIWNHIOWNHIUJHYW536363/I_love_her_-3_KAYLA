@@ -57,7 +57,7 @@ do
     UI.AimlockMethod = P1S1:AddDropdown('P1S1D3', {
         Text = 'Method',
         Values = {'Circle', 'Default (Q)'},
-        Default = 1,
+        Default = 2,
         Multi = false
     })
 
@@ -135,7 +135,35 @@ do
         NoUI = true,
     })
 
-    -- P1S1:AddDivider()
+    P1S1:AddDivider()
+
+    UI.ShowMsg = P1S1:AddToggle('P1S1T5366636', {
+        Text = 'Show Chatbar',
+        Default = false,
+    })
+    
+    Toggles.P1S1T5366636:OnChanged(function()
+        if UI.ShowMsg.Value == true then
+            game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Position = UDim2.new(0, 0, 0, 200)
+            game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible = true
+        else
+            game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Position = UDim2.new(0, 0, 0, 0)
+            game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible = false
+        end
+    end)
+
+    UI.AutoSpam = P1S1:AddToggle('P1S1T1535', {
+        Text = 'Auto Spam',
+        Default = false,
+        Tooltip = 'Spams for you'
+    })
+    UI.SpamMessage = P1S1:AddInput('P1S1I1', {
+        Text = 'Spam Message',
+        Default = '',
+        Placeholder = 'i love kayla <3',
+        Numeric = false,
+        Finished = false
+    })
 
     -- UI.FpsCap = P1S1:AddSlider('P1S1S5', {
     --     Text = 'Fps Cap',
@@ -161,6 +189,15 @@ end
 Lib.ToggleKeybind = Options.LibKeybind
 ThemeManager:ApplyToGroupbox(P1S2)
 --// Functions
+task.spawn(function()
+    SaveManager:Load('DaHood_AimTrainer')
+    -- LPH_NO_VIRTUALIZE(function()
+    while task.wait() do
+        SaveManager:Save('DaHood_AimTrainer')
+    end
+    -- end)()
+end)
+
 
 --// Utility
 do
@@ -224,13 +261,13 @@ do
         end
     end
 
-    Utils.DeleteBeam = function()
-        for _,v in next, Workspace:GetChildren() do
-            if v.Name == 'Beam' then
-                v:Destroy()
-            end
-        end
-    end
+    -- Utils.DeleteBeam = function()
+    --     for _,v in next, Workspace:GetChildren() do
+    --         if v.Name == 'Beam' or (v:IsA('Part') and v.Name == 'Part') then
+    --             v.Transparency = 1
+    --         end
+    --     end
+    -- end
 
     Utils.DeleteBots = function()
         for _,v in next, workspace:GetChildren() do
@@ -246,6 +283,13 @@ do
 
     Utils.ResetCharacter = function()
         Client.Character.Humanoid.Health = 0;
+    end
+
+    Utils.Spam = function()
+        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(
+            UI.SpamMessage.Value,
+            "All"
+        )        
     end
 end
 --// UI Options
@@ -288,18 +332,35 @@ do
 end
 --// While wait
 do
+    Workspace.ChildAdded:Connect(function(v)
+        if Utils.DeleteGunTrail then
+            if v:IsA('Part') and v.Name == 'Part' or (v.Name == 'Beam') then
+                v:Destroy()
+            end
+        end
+        if Utils.DeleteNPC == true then
+            if v.Name == 'DaTNTShow52' then
+                v:Destroy()
+            end
+        end
+    end)
+
     task.spawn(function()
         while task.wait() do
-            if Utils.DeleteNPC == true then
-                Utils.DeleteBots()
-            end
+            -- if Utils.DeleteNPC == true then
+            --     Utils.DeleteBots()
+            -- end
 
-            if Utils.DeleteGunTrail == true then
-                Utils.DeleteBeam()
-            end
+            -- if Utils.DeleteGunTrail == true then
+            --     Utils.DeleteBeam()
+            -- end
 
             if UI.AutoStomp.Value == true then
                 Utils.AutoStomp()
+            end
+
+            if UI.AutoSpam.Value == true then
+                Utils.Spam()
             end
         end
     end)
