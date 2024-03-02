@@ -289,7 +289,7 @@ do
         game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(
             UI.SpamMessage.Value,
             "All"
-        )        
+        )
     end
 end
 --// UI Options
@@ -317,6 +317,14 @@ do
 
                 if key == 'Delete NPCs' then
                     Utils.DeleteNPC = true;
+
+                    for _,v in next, Workspace:GetChildren() do
+                        if v.Name == 'DaTNTShow52' then
+                            if Utils.DeleteNPC == true then
+                                v:Destroy()
+                            end
+                        end
+                    end
                 end
             else
                 if key == 'Delete Gun-Trails' then
@@ -333,13 +341,13 @@ end
 --// While wait
 do
     Workspace.ChildAdded:Connect(function(v)
-        if Utils.DeleteGunTrail then
-            if v:IsA('Part') and v.Name == 'Part' or (v.Name == 'Beam') then
+        if v:IsA('Part') and v.Name == 'Part' or (v.Name == 'Beam') then
+            if Utils.DeleteGunTrail then
                 v:Destroy()
             end
         end
-        if Utils.DeleteNPC == true then
-            if v.Name == 'DaTNTShow52' then
+        if v.Name == 'DaTNTShow52' then
+            if Utils.DeleteNPC == true then
                 v:Destroy()
             end
         end
